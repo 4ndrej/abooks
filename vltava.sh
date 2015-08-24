@@ -14,5 +14,4 @@ ID=$(cat $TMPFILE | tr "<" "\n" | grep "player-article" | head -n 1 | sed -e "s/
 
 rm $TMPFILE
 
-wget -q http://media.rozhlas.cz/_audio/$ID.mp3 -O "$FILENAME.mp3"
-
+wget -q http://media.rozhlas.cz/_audio/$ID.mp3 -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "error"
