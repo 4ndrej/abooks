@@ -10,7 +10,18 @@ TMPFILE=$(mktemp) || { echo "Failed to create temp file"; exit 1; }
 wget -q $1 -O $TMPFILE
 
 FILENAME=$(cat $TMPFILE | tr "<" "\n" | grep "data-title=" | head -n 1 | sed -e "s/ data-url.*//g" -e "s/.*data-title=//g" | tr -d "\"" | tr ":\?\!/" "----" | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g")
-ID=$(cat $TMPFILE | tr "<" "\n" | grep "player-article" | head -n 1 | sed -e "s/.*player-article-//g" -e "s/\" class=\"uniplayer\".*//g" )
+if grep -Fxq audio-play-all $TMPFILE
+  then
+    echo "normal id"
+    ID=$(cat $TMPFILE | grep publication_id | sed -e "s/.* //g" -e "s/,.*//g")
+  else
+    echo "audiobook id"
+    ID=$(cat $TMPFILE | grep "audio-play-all" | sed -e "s/.*audio\///g" -e "s/\".*//g")
+fi
+
+echo "Filename: $FILENAME"
+echo "ID: $ID"
+echo "URL: http://media.rozhlas.cz/_audio/$ID.mp3"
 
 rm $TMPFILE
 
