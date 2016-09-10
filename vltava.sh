@@ -5,6 +5,12 @@
 # input http://www.rozhlas.cz/vltava/stream/_zprava/karel-capek-komisar-mejzlik-zasahuje--1421447
 # output wget http://media.rozhlas.cz/_audio/1421447.mp3 -O Karel\ Čapek\ -\ Komisař\ Mejzlík\ zasahuje.mp3
 
+if [[ $# -lt 1 ]]; then
+  echo "chybny pocet parametrov"
+  echo "takto: $0 http://www.rozhlas.cz/vltava/stream/_zprava/anne-nelson-chlapi--1648404"
+  exit 1
+fi
+
 TMPFILE=$(mktemp) || { echo "Failed to create temp file"; exit 1; }
 
 wget -q $1 -O $TMPFILE
