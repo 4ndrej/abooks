@@ -27,7 +27,7 @@ wget -q $1 -O $TMPFILE
 
 # http://vltava.rozhlas.cz/sites/default/files/audios/wallace_edgar_-_kriminalni_pribehy_j._g._reedera_3.mp3?uuid=58e695e17d54e
 
-FILENAME=$(cat $TMPFILE | grep h2 | grep element-invisible | sed -e 's/.*a href=".*">//g' -e "s/(do .*)//g" -e "s/\. .*//g" | tr -d "\"" | tr ":\?\!/" "----" | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g")
+FILENAME=$(cat $TMPFILE | grep og:title | sed -e "s/.*content=\"//g" -e "s/\" .*//g" | tr -d "\"" | tr ":\?\!/" "----" | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g")
 ID=$(cat $TMPFILE | grep audios | sed -e "s/.*a href=\"//g" -e "s/\?uuid.*//g")
 
 echo "Filename: $FILENAME"
