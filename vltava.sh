@@ -30,11 +30,27 @@ wget -q $1 -O $TMPFILE
 FILENAME=$(cat $TMPFILE | grep og:title | sed -e "s/.*content=\"//g" -e "s/\" .*//g" | tr -d "\"" | tr ":\?\!/" "----" | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g")
 ID=$(cat $TMPFILE | grep audios | sed -e "s/.*a href=\"//g" -e "s/\?uuid.*//g")
 
-echo "Filename: $FILENAME"
-echo "ID/URL: $ID"
-# echo "URL: http://media.rozhlas.cz/_audio/$ID.mp3"
+IDS=(${ID// / })
+RIADKOV=${#IDS[@]}
+
+if [[ $RIADKOV -lt 2 ]]; then
+  echo "Filename: $FILENAME"
+  echo "ID/URL: $ID"
+  # wget -q http://media.rozhlas.cz/_audio/$ID.mp3 -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "error"
+  echo wget -q $ID -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "error"
+else
+  echo $RIADKOV zaznamov
+
+  for INDEX in "${!IDS[@]}"
+  do
+    RIADOK=$(( 1 + $INDEX ))
+    ID=${IDS[INDEX]}
+    FILENAME2=$(echo $FILENAME $RIADOK z $RIADKOV | tr -d "\"" | tr ":\?\!/" "----" | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g")
+    echo "Filename: $FILENAME2"
+    echo "ID/URL: $ID"
+    echo wget -q $ID -O "$FILENAME2.mp3"
+    wget -q $ID -O "$FILENAME2.mp3" && echo "$FILENAME2.mp3 OK" || echo "error"
+  done
+fi
 
 rm $TMPFILE
-
-# wget -q http://media.rozhlas.cz/_audio/$ID.mp3 -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "error"
-wget -q $ID -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "error"
