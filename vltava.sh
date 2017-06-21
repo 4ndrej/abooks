@@ -15,18 +15,6 @@ TMPFILE=$(mktemp) || { echo "Failed to create temp file"; exit 1; }
 
 wget -q $1 -O $TMPFILE
 
-# FILENAME=$(cat $TMPFILE | tr "<" "\n" | grep "data-title=" | head -n 1 | sed -e "s/ data-url.*//g" -e "s/.*data-title=//g" | tr -d "\"" | tr ":\?\!/" "----" | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g")
-# if grep -Fxq audio-play-all $TMPFILE
-#   then
-#     echo "normal id"
-#     ID=$(cat $TMPFILE | grep publication_id | sed -e "s/.* //g" -e "s/,.*//g")
-#   else
-#     echo "audiobook id"
-#     ID=$(cat $TMPFILE | grep "audio-play-all" | sed -e "s/.*audio\///g" -e "s/\".*//g")
-# fi
-
-# http://vltava.rozhlas.cz/sites/default/files/audios/wallace_edgar_-_kriminalni_pribehy_j._g._reedera_3.mp3?uuid=58e695e17d54e
-
 FILENAME=$(cat $TMPFILE | grep og:title | sed -e "s/.*content=\"//g" -e "s/\" .*//g" | tr -d "\"" | tr ":\?\!/" "----" | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g")
 ID=$(cat $TMPFILE | grep audios | sed -e "s/.*a href=\"//g" -e "s/\?uuid.*//g")
 
@@ -34,10 +22,9 @@ IDS=(${ID// / })
 RIADKOV=${#IDS[@]}
 
 if [[ $RIADKOV -lt 2 ]]; then
-  echo "Filename: $FILENAME"
+  # echo "Filename: $FILENAME"
   echo "ID/URL: $ID"
-  # wget -q http://media.rozhlas.cz/_audio/$ID.mp3 -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "error"
-  echo wget -q $ID -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "error"
+  wget -q $ID -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "$FILENAME.mp3 ERROR"
 else
   echo $RIADKOV zaznamov
 
@@ -45,11 +32,11 @@ else
   do
     RIADOK=$(( 1 + $INDEX ))
     ID=${IDS[INDEX]}
-    FILENAME2=$(echo $FILENAME $RIADOK z $RIADKOV | tr -d "\"" | tr ":\?\!/" "----" | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g")
-    echo "Filename: $FILENAME2"
+    FILENAME2=$(echo $FILENAME \($RIADOK z $RIADKOV\) | tr -d "\"" | tr ":\?\!/" "----" | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g")
+    # echo "Filename: $FILENAME2"
     echo "ID/URL: $ID"
-    echo wget -q $ID -O "$FILENAME2.mp3"
-    wget -q $ID -O "$FILENAME2.mp3" && echo "$FILENAME2.mp3 OK" || echo "error"
+    wget -q $ID -O "$FILENAME2.mp3" && echo "$FILENAME2.mp3 OK" || echo "$FILENAME2.mp3 ERROR"
+    echo
   done
 fi
 
