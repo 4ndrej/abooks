@@ -15,7 +15,7 @@ TMPFILE=$(mktemp) || { echo "Failed to create temp file"; exit 1; }
 
 wget -q $1 -O $TMPFILE
 
-FILENAME=$(cat $TMPFILE | grep og:title | sed -e "s/.*content=\"//g" -e "s/\" .*//g" | tr -d "\"" | tr ":\?\!/" "----" | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g")
+FILENAME=$(cat $TMPFILE | grep og:title | sed -e "s/.*content=\"//g" -e "s/\" .*//g" -e "s/\..*//g" | tr -d "\"" | tr ":\?\!/" "----" | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g")
 ID=$(cat $TMPFILE | grep audios | sed -e "s/.*a href=\"//g" -e "s/\?uuid.*//g")
 
 IDS=(${ID// / })
