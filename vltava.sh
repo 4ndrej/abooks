@@ -21,7 +21,13 @@ ID=$(cat $TMPFILE | grep filename | sed -e "s/.*a href=\"//g" -e "s/\?uuid.*//g"
 IDS=(${ID// / })
 RIADKOV=${#IDS[@]}
 
-if [[ $RIADKOV -lt 2 ]]; then
+if [[ $RIADKOV -eq 0 ]]; then
+  FILENAME=$(cat $TMPFILE | grep "><h1>" | grep image | grep title | sed -e "s/.*<h1>//g" -e "s/<\/h1>.*//g" | tr -d "\"" | tr ":\?\!/" "----" | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g" | head -n 1)
+  ID=$(cat $TMPFILE | grep player-archive | sed -e "s/.*a><a href=\"http:\/\/prehravac.rozhlas.cz\/audio\//http:\/\/media.rozhlas.cz\/_audio\//g" -e "s/\" title.*//g" | head -n 1)
+  # echo "Filename: $FILENAME"
+  echo "ID/URL: $ID"
+  wget -q $ID -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "$FILENAME.mp3 ERROR"
+elif [[ $RIADKOV -eq 1 ]]; then
   # echo "Filename: $FILENAME"
   echo "ID/URL: $ID"
   wget -q $ID -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "$FILENAME.mp3 ERROR"
@@ -36,6 +42,7 @@ else
     # echo "Filename: $FILENAME2"
     echo "ID/URL: $ID"
     wget -q $ID -O "$FILENAME2.mp3" && echo "$FILENAME2.mp3 OK" || echo "$FILENAME2.mp3 ERROR"
+    id3v2 --track $RIADOK/$RIADKOV $FILENAME2.mp3 >/dev/null 2>&1
     echo
   done
 fi
