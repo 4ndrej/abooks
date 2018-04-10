@@ -42,9 +42,9 @@ else
   do
     RIADOK=$(( 1 + $INDEX ))
     ID=${IDS[INDEX]}
-    FILENAME=${TITLES[INDEX]}
+    FILENAME=${TITLES[INDEX]}-$((INDEX+1))
     # FILENAME2=$(echo $FILENAME \($RIADOK z $RIADKOV\) | tr -d "\"" | tr ":\?\!/" "----" | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g")
-    # echo "Filename: $FILENAME2"
+    # echo "Filename: $FILENAME"
     echo "ID/URL: $ID"
     wget $WGET_PARAMS -q $ID -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "$FILENAME.mp3 ERROR"
     # id3v2 --track $RIADOK/$RIADKOV $FILENAME.mp3 >/dev/null 2>&1
