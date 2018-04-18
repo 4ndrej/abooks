@@ -17,26 +17,26 @@ TMPFILE=$(mktemp) || { echo "Failed to create temp file"; exit 1; }
 
 wget -q $1 -O $TMPFILE
 
-FILENAME=$(\
+FILENAME=$( \
     cat $TMPFILE \
     | grep og:title \
     | sed -e "s/.*content=\"//g" -e "s/\" .*//g" -e "s/\. *\(.*\)/ (\1)/g" \
     | tr -d "\"" \
     | tr ":\?\!/" "----" \
-    | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g"\
+    | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g" \
 )
-ID=$(
+ID=$( \
     cat $TMPFILE \
     | grep filename \
     | grep -v rights-expired \
-    | sed -e "s/.*a href=\"//g" -e "s/\?uuid.*//g"\
+    | sed -e "s/.*a href=\"//g" -e "s/\?uuid.*//g" \
 )
 
 IDS=(${ID// / })
 RIADKOV=${#IDS[@]}
 
 if [[ $RIADKOV -eq 0 ]]; then
-    FILENAME=$(\
+    FILENAME=$( \
         cat $TMPFILE \
         | grep "><h1>" \
         | grep image \
@@ -45,13 +45,13 @@ if [[ $RIADKOV -eq 0 ]]; then
         | tr -d "\"" \
         | tr ":\?\!/" "----" \
         | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g" \
-        | head -n 1\
+        | head -n 1 \
     )
-    ID=$(\
+    ID=$( \
         cat $TMPFILE \
         | grep player-archive \
         | sed -e "s/.*a><a href=\"http:\/\/prehravac.rozhlas.cz\/audio\//http:\/\/media.rozhlas.cz\/_audio\//g" -e "s/\" title.*//g" \
-        | head -n 1\
+        | head -n 1 \
     )
     # echo "Filename: $FILENAME"
     echo "ID/URL: $ID"
@@ -61,12 +61,12 @@ elif [[ $RIADKOV -eq 1 ]]; then
     echo "ID/URL: $ID"
     wget $WGET_PARAMS -q $ID -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "$FILENAME.mp3 ERROR"
 else
-    ITERATOR=$(\
+    ITERATOR=$( \
         cat $TMPFILE \
         | grep a-004b__iterator \
         | sed -e 's|.*">\(.*\)</span.*|\1|g' \
     )
-    TITLE_EXPIRED=$(\
+    TITLE_EXPIRED=$( \
         cat $TMPFILE \
         | grep filename \
         | grep rights-expired \
@@ -77,14 +77,14 @@ else
 
     echo $TITLE_EXPIRED_COUNT expirovanych zaznamov
     echo $RIADKOV dostupnych zaznamov
-    TITLE_VALID=$(\
+    TITLE_VALID=$( \
         cat $TMPFILE \
         | grep filename \
         | grep -v rights-expired \
         | sed -e "s/.*title=\"//g" -e "s/\">.*//g" \
         | tr -d "\"" \
         | tr ":\?\!/" "----" \
-        | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g"\
+        | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g" \
     )
     IFS=$'\n' TITLES=(${TITLE_EXPIRED} ${TITLE_VALID})
     ITERATORS=(${ITERATOR// / })
