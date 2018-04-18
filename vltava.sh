@@ -61,8 +61,23 @@ elif [[ $RIADKOV -eq 1 ]]; then
     echo "ID/URL: $ID"
     wget $WGET_PARAMS -q $ID -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "$FILENAME.mp3 ERROR"
 else
-    echo $RIADKOV zaznamov
-    TITLE_ALL=$(\
+    ITERATOR=$(\
+        cat $TMPFILE \
+        | grep a-004b__iterator \
+        | sed -e 's|.*">\(.*\)</span.*|\1|g' \
+    )
+    TITLE_EXPIRED=$(\
+        cat $TMPFILE \
+        | grep filename \
+        | grep rights-expired \
+        | sed -e "s/.*/~/g" \
+    )
+    TITLE_EXPIRED_ARR=(${TITLE_EXPIRED// / })
+    TITLE_EXPIRED_COUNT=${#TITLE_EXPIRED_ARR[@]}
+
+    echo $TITLE_EXPIRED_COUNT expirovanych zaznamov
+    echo $RIADKOV dostupnych zaznamov
+    TITLE_VALID=$(\
         cat $TMPFILE \
         | grep filename \
         | grep -v rights-expired \
@@ -71,13 +86,20 @@ else
         | tr ":\?\!/" "----" \
         | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g"\
     )
-    IFS=$'\n' TITLES=(${TITLE_ALL})
+    IFS=$'\n' TITLES=(${TITLE_EXPIRED} ${TITLE_VALID})
+    ITERATORS=(${ITERATOR// / })
 
-    for INDEX in "${!IDS[@]}"
+    # for INDEX in "${!IDS[@]}"
+    for INDEX in "${!ITERATORS[@]}"
     do
+        # skip expired links (indicated by TITLE == ~)
+        if [[ ${TITLES[INDEX]} == '~' ]]; then
+            echo "preskakujem expirovany zaznam ${ITERATORS[INDEX]}"
+            continue
+        fi
         RIADOK=$(( 1 + $INDEX ))
-        ID=${IDS[INDEX]}
-        FILENAME=${TITLES[INDEX]}-$((INDEX+1))
+        ID=${IDS[INDEX-TITLE_EXPIRED_COUNT]}
+        FILENAME="${TITLES[INDEX]} - ${ITERATORS[INDEX]}"
         # FILENAME2=$(echo $FILENAME \($RIADOK z $RIADKOV\) | tr -d "\"" | tr ":\?\!/" "----" | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g")
         # echo "Filename: $FILENAME"
         echo "ID/URL: $ID"
