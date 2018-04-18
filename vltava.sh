@@ -100,7 +100,6 @@ else
         RIADOK=$(( 1 + $INDEX ))
         ID=${IDS[INDEX-TITLE_EXPIRED_COUNT]}
         FILENAME="${TITLES[INDEX]} - ${ITERATORS[INDEX]}"
-        # FILENAME2=$(echo $FILENAME \($RIADOK z $RIADKOV\) | tr -d "\"" | tr ":\?\!/" "----" | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g")
         # echo "Filename: $FILENAME"
         echo "ID/URL: $ID"
         wget $WGET_PARAMS -q $ID -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "$FILENAME.mp3 ERROR"
