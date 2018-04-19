@@ -1,5 +1,12 @@
 # pirating russian pirates with joy
 # https://www.goldenmp3.ru/compilations/electro-mode-an-electro-tribute-to-depeche-mode
+
+if [[ $# -lt 1 ]]; then
+    echo "chybny pocet parametrov"
+    echo "takto: $0 https://www.goldenmp3.ru/compilations/electro-mode-an-electro-tribute-to-depeche-mode"
+    exit 1
+fi
+
 wget -q $1 -O - \
     | sed \
         -e 's|<tr |\n<tr |g' \
