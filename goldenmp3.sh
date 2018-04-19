@@ -11,6 +11,15 @@ TMPFILE=$(mktemp) || { echo "Failed to create temp file"; exit 1; }
 
 wget -q $1 -O $TMPFILE
 
+# album folder
+ALBUM_FOLDER=$( \
+    cat $TMPFILE \
+        | sed -e 's|.*sub_span2" itemprop="name">\(.*\)</span></h1>.*itemprop="datePublished">\(.*\)</span></p>.*|\2. \1|g' \
+)
+echo Creating $ALBUM_FOLDER
+mkdir "$ALBUM_FOLDER"
+cd "$ALBUM_FOLDER"
+
 # album cover file
 cat $TMPFILE \
     | sed -e 's|.*\(https://files.musicmp3.ru/bcovers/alb[0-9]*\.jpg\).*|wget -c -O cover.jpg \1|g' \
@@ -34,3 +43,4 @@ cat $TMPFILE \
     | bash
 
 rm $TMPFILE
+cd -
