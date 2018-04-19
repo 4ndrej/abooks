@@ -14,7 +14,9 @@ wget -q $1 -O $TMPFILE
 # album folder
 ALBUM_FOLDER=$( \
     cat $TMPFILE \
-        | sed -e 's|.*sub_span2" itemprop="name">\(.*\)</span></h1>.*itemprop="datePublished">\(.*\)</span></p>.*|\2. \1|g' \
+        | sed \
+            -e 's|.*sub_span2" itemprop="name">\(.*\)</span></h1>.*itemprop="datePublished">\(.*\)</span></p>.*|\2. \1|g' \
+            -e 's|&amp;|\&|g' \
 )
 echo Creating $ALBUM_FOLDER
 mkdir "$ALBUM_FOLDER"
@@ -43,4 +45,5 @@ cat $TMPFILE \
     | bash
 
 rm $TMPFILE
+echo $ALBUM_FOLDER done.
 cd -
