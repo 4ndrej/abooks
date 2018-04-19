@@ -4,15 +4,24 @@
 if [[ $# -lt 1 ]]; then
     echo "chybny pocet parametrov"
     echo "takto: $0 https://www.goldenmp3.ru/depeche-mode/shake-the-disease"
+    echo "alebo: $0 album_prefix https://www.goldenmp3.ru/depeche-mode/shake-the-disease"
     exit 1
 fi
 
 TMPFILE=$(mktemp) || { echo "Failed to create temp file"; exit 1; }
 
-wget -q $1 -O $TMPFILE
+if [[ $# -eq 1 ]]; then
+    URL=$1
+    PREFIX=''
+elif [[ $# -eq 2 ]]; then
+    PREFIX=$1' '
+    URL=$2
+fi
+
+wget -q $URL -O $TMPFILE
 
 # album folder
-ALBUM_FOLDER=$( \
+ALBUM_FOLDER=$PREFIX$( \
     cat $TMPFILE \
         | sed \
             -e 's|.*sub_span2" itemprop="name">\(.*\)</span></h1>.*itemprop="datePublished">\(.*\)</span></p>.*|\2. \1|g' \
