@@ -13,7 +13,7 @@ wget -q $1 -O $TMPFILE
 
 # album cover file
 cat $TMPFILE \
-    | sed -e 's|.*\(https://files.musicmp3.ru/bcovers/alb[0-9]*\.jpg\).* | wget -c -O cover.jpg \1|g' \
+    | sed -e 's|.*\(https://files.musicmp3.ru/bcovers/alb[0-9]*\.jpg\).*|wget -c -O cover.jpg \1|g' \
     | bash
 
 # music files
