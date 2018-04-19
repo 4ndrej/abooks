@@ -7,7 +7,11 @@ if [[ $# -lt 1 ]]; then
     exit 1
 fi
 
-wget -q $1 -O - \
+TMPFILE=$(mktemp) || { echo "Failed to create temp file"; exit 1; }
+
+wget -q $1 -O $TMPFILE
+
+cat $TMPFILE \
     | sed \
         -e 's|<tr |\n<tr |g' \
         -e 's|</tr>|</tr>\n|g' \
@@ -22,3 +26,5 @@ wget -q $1 -O - \
     | sed \
         -e 's|\(.*\);\(.*\)|wget https://listen.musicmp3.ru/\1 --referer="https://www.goldenmp3.ru/compilations/electro-mode-an-electro-tribute-to-depeche-mode" -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.88 Safari/537.36" -O "\2.mp3"|g' \
     | bash
+
+rm $TMPFILE
