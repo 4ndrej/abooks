@@ -3,7 +3,7 @@
 
 if [[ $# -lt 1 ]]; then
     echo "chybny pocet parametrov"
-    echo "takto: $0 https://www.goldenmp3.ru/compilations/electro-mode-an-electro-tribute-to-depeche-mode"
+    echo "takto: $0 https://www.goldenmp3.ru/depeche-mode/shake-the-disease"
     exit 1
 fi
 
@@ -13,7 +13,8 @@ wget -q $1 -O $TMPFILE
 
 # album cover file
 cat $TMPFILE \
-    | sed -e 's|.*\(https://files.musicmp3.ru/bcovers/alb[0-9]*\.jpg\).* | wget -O cover.jpg \1|g' | bash
+    | sed -e 's|.*\(https://files.musicmp3.ru/bcovers/alb[0-9]*\.jpg\).* | wget -O cover.jpg \1|g' \
+    | bash
 
 # music files
 cat $TMPFILE \
