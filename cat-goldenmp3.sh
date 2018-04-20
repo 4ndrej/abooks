@@ -22,7 +22,7 @@ cat $TMPFILE \
         -e 's|gr_names" href="\(.*\)" itemprop="url">|\1|g' \
     | grep gr_names \
     | sed -e 's|.*href="\(.*\)"|./goldenmp3.sh '$PREFIX' https://www.goldenmp3.ru\1; sleep 1m|g' \
-    | sort -r \
+    | tac \
     | bash
 
 rm $TMPFILE
