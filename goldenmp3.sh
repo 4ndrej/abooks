@@ -26,6 +26,7 @@ ALBUM_FOLDER=$PREFIX$( \
         | sed \
             -e 's|.*sub_span2" itemprop="name">\(.*\)</span></h1>.*itemprop="datePublished">\(.*\)</span></p>.*|\2. \1|g' \
             -e 's|&amp;|\&|g' \
+            -e 's|/|-|g' \
 )
 echo Creating $ALBUM_FOLDER
 mkdir "$ALBUM_FOLDER"
@@ -49,6 +50,7 @@ cat $TMPFILE \
         -e 's|&ensp;<span itemprop="name">| |g' \
         -e 's|</span>.*||g' \
         -e 's|&amp;|\&|g' \
+        -e 's|/|-|g' \
     | sed \
         -e 's|\(.*\);\(.*\)|wget -c https://listen.musicmp3.ru/\1 --referer="https://www.goldenmp3.ru/compilations/electro-mode-an-electro-tribute-to-depeche-mode" -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.88 Safari/537.36" -O "\2.mp3"|g' \
     | bash
