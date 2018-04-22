@@ -29,7 +29,7 @@ ALBUM_FOLDER=$PREFIX$( \
             -e 's|/|-|g' \
 )
 echo Creating $ALBUM_FOLDER
-mkdir "$ALBUM_FOLDER"
+mkdir -p "$ALBUM_FOLDER"
 cd "$ALBUM_FOLDER"
 
 # album cover file
