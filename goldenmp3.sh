@@ -20,14 +20,17 @@ fi
 
 wget -q $URL -O $TMPFILE
 
+# fix ` in album/song names (which is tricky to escape in sed+bash) 
+sed -i -e "s|\`|'|g" $TMPFILE
+
 # album folder
-ALBUM_FOLDER=$PREFIX$( \
+ALBUM_FOLDER="$PREFIX$( \
     cat $TMPFILE \
         | sed \
             -e 's|.*sub_span2" itemprop="name">\(.*\)</span></h1>.*itemprop="datePublished">\(.*\)</span></p>.*|\2. \1|g' \
             -e 's|&amp;|\&|g' \
             -e 's|/|-|g' \
-)
+)"
 echo Creating $ALBUM_FOLDER
 mkdir -p "$ALBUM_FOLDER"
 cd "$ALBUM_FOLDER"
