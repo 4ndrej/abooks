@@ -61,10 +61,10 @@ if [[ $RIADKOV -eq 0 ]]; then
         echo "ID/URL: $ID"
         wget "$WGET_PARAMS" -q "$ID" -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "$FILENAME.mp3 ERROR"
     fi
-elif [[ $RIADKOV -eq 1 ]]; then
-    # echo "Filename: $FILENAME"
-    echo "ID/URL: $ID"
-    wget "$WGET_PARAMS" -q "$ID" -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "$FILENAME.mp3 ERROR"
+# elif [[ $RIADKOV -eq 1 ]]; then
+#     # echo "Filename: $FILENAME"
+#     echo "ID/URL: $ID"
+#     wget "$WGET_PARAMS" -q "$ID" -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "$FILENAME.mp3 ERROR"
 else
     ITERATOR=$( \
         < "$TMPFILE" \
