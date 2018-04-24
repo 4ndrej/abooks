@@ -1,3 +1,4 @@
+#!/bin/bash
 # pirating russian pirates with joy
 # https://www.goldenmp3.ru/compilations/electro-mode-an-electro-tribute-to-depeche-mode
 
@@ -18,31 +19,31 @@ elif [[ $# -eq 2 ]]; then
     URL=$2
 fi
 
-wget -q $URL -O $TMPFILE
+wget -q "$URL" -O "$TMPFILE"
 
 # fix ` in album/song names (which is tricky to escape in sed+bash) 
-sed -i -e "s|\`|'|g" $TMPFILE
+sed -i -e "s|\`|'|g" "$TMPFILE"
 
 # album folder
 ALBUM_FOLDER="$PREFIX$( \
-    cat $TMPFILE \
-        | sed \
+    < "$TMPFILE" \
+        sed \
             -e 's|.*sub_span2" itemprop="name">\(.*\)</span></h1>.*itemprop="datePublished">\(.*\)</span></p>.*|\2. \1|g' \
             -e 's|&amp;|\&|g' \
             -e 's|/|-|g' \
 )"
-echo Creating $ALBUM_FOLDER
+echo "Creating $ALBUM_FOLDER"
 mkdir -p "$ALBUM_FOLDER"
-cd "$ALBUM_FOLDER"
+cd "$ALBUM_FOLDER" || { echo "Error cd into $ALBUM_FOLDER"; exit 1; }
 
 # album cover file
-cat $TMPFILE \
-    | sed -e 's|.*\(https://files.musicmp3.ru/bcovers/alb[0-9]*\.jpg\).*|wget -c -O cover.jpg \1|g' \
+< "$TMPFILE" \
+    sed -e 's|.*\(https://files.musicmp3.ru/bcovers/alb[0-9]*\.jpg\).*|wget -c -O cover.jpg \1|g' \
     | bash
 
 # music files
-cat $TMPFILE \
-    | sed \
+< "$TMPFILE" \
+    sed \
         -e 's|<tr |\n<tr |g' \
         -e 's|</tr>|</tr>\n|g' \
     | grep "<tr" \
@@ -58,6 +59,6 @@ cat $TMPFILE \
         -e 's|\(.*\);\(.*\)|wget -c https://listen.musicmp3.ru/\1 --referer="https://www.goldenmp3.ru/compilations/electro-mode-an-electro-tribute-to-depeche-mode" -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.88 Safari/537.36" -O "\2.mp3"|g' \
     | bash
 
-rm $TMPFILE
-echo $ALBUM_FOLDER done.
-cd -
+rm "$TMPFILE"
+echo "$ALBUM_FOLDER" done.
+cd - || exit
