@@ -5,6 +5,8 @@
 # input http://www.rozhlas.cz/vltava/stream/_zprava/karel-capek-komisar-mejzlik-zasahuje--1421447
 # output wget http://media.rozhlas.cz/_audio/1421447.mp3 -O Karel\ Čapek\ -\ Komisař\ Mejzlík\ zasahuje.mp3
 
+# echo params: $0 $1 $2
+
 if [[ $# -lt 1 ]]; then
     echo "chybny pocet parametrov"
     echo "takto: $0 http://vltava.rozhlas.cz/edgar-wallace-kriminalni-pribehy-johna-g-reedera-36-zamilovany-policista-5346045"
@@ -31,11 +33,37 @@ ID=$( \
     | grep -v rights-expired \
     | sed -e "s/.*a href=\"//g" -e "s/\?uuid.*//g" \
 )
+ITERATOR=$( \
+    < "$TMPFILE" \
+    grep a-004b__iterator \
+    | sed -e 's|.*">\(.*\)</span.*|\1|g' \
+)
 
 IDS=(${ID// / })
 RIADKOV=${#IDS[@]}
+ITERATORS=(${ITERATOR// / })
 
 if [[ $RIADKOV -eq 0 ]]; then
+    if [[ ${#ITERATORS[@]} -ne 0 ]]; then
+
+        # TODO toto poriadne nefunguje
+        # ladit na https://vltava.rozhlas.cz/lesni-lisky-a-jine-povidky-finskych-autoru-7176407
+
+        # lead stranka so zoznamom liniek na samostatne stranky
+        echo lead stranka so zoznamom liniek na samostatne stranky
+        SUBFILES=$(< $TMPFILE \
+            grep "a-004b__link" \
+            | sed -e 's|.*href="\(.*\)">|'$0' https://vltava.rozhlas.cz\1|g'
+        )
+        echo SUBFILES: $SUBFILES
+        for i in "${SUBFILES[@]}"
+        do
+        echo SUBFILE: $i
+        done
+        rm "$TMPFILE"
+        exit
+    fi
+
     FILENAME=$( \
         < "$TMPFILE" \
         grep "><h1>" \
@@ -61,16 +89,11 @@ if [[ $RIADKOV -eq 0 ]]; then
         echo "ID/URL: $ID"
         wget "$WGET_PARAMS" -q "$ID" -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "$FILENAME.mp3 ERROR"
     fi
-# elif [[ $RIADKOV -eq 1 ]]; then
-#     # echo "Filename: $FILENAME"
-#     echo "ID/URL: $ID"
-#     wget "$WGET_PARAMS" -q "$ID" -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "$FILENAME.mp3 ERROR"
+elif [[ $RIADKOV -eq 1 ]]; then
+    # echo "Filename: $FILENAME"
+    echo "ID/URL: $ID"
+    wget "$WGET_PARAMS" -q "$ID" -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "$FILENAME.mp3 ERROR"
 else
-    ITERATOR=$( \
-        < "$TMPFILE" \
-        grep a-004b__iterator \
-        | sed -e 's|.*">\(.*\)</span.*|\1|g' \
-    )
     TITLE_EXPIRED=$( \
         < "$TMPFILE" \
         grep filename \
@@ -92,7 +115,16 @@ else
         | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g" \
     )
     IFS=$'\n' TITLES=(${TITLE_EXPIRED} ${TITLE_VALID})
-    ITERATORS=(${ITERATOR// / })
+
+    # lead stranka so zoznamom liniek na samostatne stranky
+    EPISODES=$( \
+        < "$TMPFILE" \
+        grep "button-series__label-complement" \
+        | wc -l \
+    )
+    if [[ $EPISODES -eq 2 ]]; then
+        ITERATORS=(1)
+    fi
 
     # for INDEX in "${!IDS[@]}"
     for INDEX in "${!ITERATORS[@]}"
