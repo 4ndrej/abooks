@@ -100,11 +100,12 @@ if [[ $RIADKOV -eq 0 ]]; then
         if [[ $ID == "" ]]; then
             # sem fallbackne aj multifile stranka ktora ma vsetky zaznamy expirovane
             echo ziadny zaznam na stiahnutie
+        else
+            # echo "Filename: $FILENAME"
+            echo "ID/URL: $ID"
+            wget "$WGET_PARAMS" -q "$ID" -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "$FILENAME.mp3 ERROR"
         fi
     fi
-    # echo "Filename: $FILENAME"
-    echo "ID/URL: $ID"
-    wget "$WGET_PARAMS" -q "$ID" -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "$FILENAME.mp3 ERROR"
 elif [[ $RIADKOV -eq 1 ]]; then
     # echo "Filename: $FILENAME"
     echo "ID/URL: $ID"
