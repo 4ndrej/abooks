@@ -83,12 +83,28 @@ if [[ $RIADKOV -eq 0 ]]; then
     )"
     if [[ $ID == "" ]]; then
         # sem fallbackne aj multifile stranka ktora ma vsetky zaznamy expirovane
-        echo ziadny zaznam na stiahnutie
-    else
-        # echo "Filename: $FILENAME"
-        echo "ID/URL: $ID"
-        wget "$WGET_PARAMS" -q "$ID" -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "$FILENAME.mp3 ERROR"
+        echo skusam fix pre stranku s jednym suborom
+        FILENAME=$( \
+            < "$TMPFILE" \
+            grep "mp3" \
+            | sed -e 's/.*">//g' -e 's/<.*//g' \
+            | tr ":\?\!/" "----" \
+            | sed -e "s/-/ - /g" -e "s/  / /g" -e "s/ $//g" -e "s/ /\\ /g" \
+            | head -n 1 \
+        )
+        ID=$( \
+            < "$TMPFILE" \
+            grep mp3 \
+            | sed -e 's/.*href="//g' -e 's/">.*//g' \
+        )
+        if [[ $ID == "" ]]; then
+            # sem fallbackne aj multifile stranka ktora ma vsetky zaznamy expirovane
+            echo ziadny zaznam na stiahnutie
+        fi
     fi
+    # echo "Filename: $FILENAME"
+    echo "ID/URL: $ID"
+    wget "$WGET_PARAMS" -q "$ID" -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "$FILENAME.mp3 ERROR"
 elif [[ $RIADKOV -eq 1 ]]; then
     # echo "Filename: $FILENAME"
     echo "ID/URL: $ID"
