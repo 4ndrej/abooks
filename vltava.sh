@@ -7,6 +7,8 @@
 
 # echo params: $0 $1 $2
 
+DEBUG=1
+
 if [[ $# -lt 1 ]]; then
     echo "chybny pocet parametrov"
     echo "takto: $0 http://vltava.rozhlas.cz/edgar-wallace-kriminalni-pribehy-johna-g-reedera-36-zamilovany-policista-5346045"
@@ -29,7 +31,8 @@ FILENAME=$( \
 )
 ID=$( \
     < "$TMPFILE" \
-    grep filename \
+    sed -e "s|</li>|</li>\n|g"  \
+    | grep filename \
     | grep -v rights-expired \
     | sed -e "s/.*a href=\"//g" -e "s/\?uuid.*//g" \
 )
@@ -103,17 +106,20 @@ if [[ $RIADKOV -eq 0 ]]; then
         else
             # echo "Filename: $FILENAME"
             echo "ID/URL: $ID"
+            [ $DEBUG -eq 1 ] && echo "DEBUG #1"
             wget "$WGET_PARAMS" -q "$ID" -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "$FILENAME.mp3 ERROR"
         fi
     fi
 elif [[ $RIADKOV -eq 1 ]]; then
     # echo "Filename: $FILENAME"
     echo "ID/URL: $ID"
+    [ $DEBUG -eq 1 ] && echo "DEBUG #2"
     wget "$WGET_PARAMS" -q "$ID" -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "$FILENAME.mp3 ERROR"
 else
     TITLE_EXPIRED=$( \
         < "$TMPFILE" \
         grep filename \
+        | sed -e "s|</li>|</li>\n|g"  \
         | grep rights-expired \
         | sed -e "s/.*/~/g" \
     )
@@ -125,6 +131,7 @@ else
     TITLE_VALID=$( \
         < "$TMPFILE" \
         grep filename \
+        | sed -e "s|</li>|</li>\n|g"  \
         | grep -v rights-expired \
         | sed -e "s/.*title=\"//g" -e "s/\">.*//g" \
         | tr -d "\"" \
@@ -155,6 +162,7 @@ else
         FILENAME="${TITLES[INDEX]} - ${ITERATORS[INDEX]}"
         # echo "Filename: $FILENAME"
         echo "ID/URL: $ID"
+        [ $DEBUG -eq 1 ] && echo "DEBUG #3"
         wget "$WGET_PARAMS" -q "$ID" -O "$FILENAME.mp3" && echo "$FILENAME.mp3 OK" || echo "$FILENAME.mp3 ERROR"
         # RIADOK=$(( 1 + $INDEX ))
         # id3v2 --track $RIADOK/$RIADKOV $FILENAME.mp3 >/dev/null 2>&1
