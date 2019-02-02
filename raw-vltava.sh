@@ -1,0 +1,1 @@
+wget -O - $1 | sed -e "s/<li/\n<li/g" -e "s/<\/li/\n<\/li/g" |grep filename | grep -v expired | sed -e 's/.*a href="/wget /g' -e 's/"\?uuid=.*title="/ -O "/g' -e 's/\. díl: .*/"/g' -e 's/">/ /g' -e 's/"$/.mp3"/g'
